@@ -2,19 +2,33 @@
 
 class LsMTG:
     def __init__(self, lstring, scales = {}, consider = ConsiderFilter.ignorePredefined()):
-        self._lstring = lstring
+        """
+        Initialization of the LsMTG structure.
+
+       :Parameters:
+            - `lstring`  : The Lstring to manipulate as MTG is given. 
+            - `scales`   : Dictionnary giving scale for each type of module.
+            - `consider` : The filter that give the module of the lstring to consider
+        """
+        self.lstring = lstring
         self.consider = consider
-        self.scales   = scales
-        self.defaultscale = 1
+        self._scales   = scales
+        self.defaultscale = 1 # default scale for modules
 
     def scale_property(self):
+        """
+        Compute the scale of every nodes.
+        """
         scales = {}
         for vtx in self.vertices():
-            scale[vtx] = self.scale[lstring[vtx].name]
+            scales[vtx] = self._scales.get(lstring[vtx].name, self.defaultscale)
         return scales
 
     def scale_values(self):
-        return [self.scale[lstring[vtx].name] for vtx in self.vertices()]
+        """
+        Return the scale of each vertices in the order of vertices
+        """
+        return [self._scales[self.lstring[vtx].name] for vtx in self.vertices()]
 
     def scale(self, vid):
         ''' Returns the scale of a vertex.
@@ -35,7 +49,7 @@ class LsMTG:
             The scale of the vertex.
             It is a positive int in [0,g.max_scale()].
         '''
-        return self.scale.get(lstring[vid].name, self.defaultscale)
+        return self._scales.get(self.lstring[vid].name, self.defaultscale)
 
     def nb_scales(self):
         '''
@@ -46,7 +60,7 @@ class LsMTG:
 
         .. note:: The complexity is :math:`O(n)`.
         '''
-        return len(set(self.scales.values()))
+        return len(set(self._scales.values()))
         # return len(self.scale_values())
 
     def scales_iter(self):
@@ -57,7 +71,7 @@ class LsMTG:
 
         .. note:: The complexity is :math:`O(n)`.
         '''
-        return iter(set(self.scales.values()))
+        return iter(set(self._scales.values()))
         # return iter(self.scale_values())
 
     def scales(self):
@@ -68,7 +82,7 @@ class LsMTG:
 
         .. note:: The complexity is :math:`O(n)`.
         '''
-        return set(self.scales.values())
+        return set(self._scales.values())
         # return set(self.scale_values())
 
     def max_scale(self):
@@ -85,7 +99,7 @@ class LsMTG:
         .. note:: The complexity is :math:`O(n)`.
         .. seealso:: :func:`scale`, :func:`scales`
         '''
-        return max(self.scales.values())
+        return max(self._scales.values())
         # return max(self.scale_values())
 
     #########################################################################
@@ -143,7 +157,7 @@ class LsMTG:
 
         .. seealso:: :meth:`children`, :meth:`components`, :meth:`vertices_iter`..
         '''
-        return [vtx for vtx in range(len(lstring)) if self.consider.isConsider(lstring[vtx]) and (scale == -1 or self.scale(vtx) == scale)]
+        return [vtx for vtx, mod in enumerate(self.lstring) if self.consider.isConsider(mod) and (scale == -1 or self.scale(vtx) == scale)]
 
     def vertices_iter(self, scale = -1):
         '''
@@ -379,9 +393,8 @@ class LsMTG:
             int
         '''
 
-        child = super(MTG, self).add_child(parent, child, **properties)
-        self._scale[child] = self._scale[parent]
-        return child
+        ### TOBEDONE
+        return child_id
 
     def insert_sibling(self, vtx_id1, vtx_id2=None, **properties):
         '''
@@ -396,9 +409,8 @@ class LsMTG:
         :Returns Type:
             int
         '''
-        vtx_id2 = super(MTG, self).insert_sibling(vtx_id1, vtx_id2, **properties)
-        self._scale[vtx_id2] = self._scale[vtx_id1]
-        return vtx_id2
+        ### TOBEDONE
+        return sibling_id
 
     def insert_parent(self, vtx_id, parent_id=None, **properties):
         '''
@@ -414,14 +426,8 @@ class LsMTG:
         :Returns Type:
             int
         '''
-        if parent_id is None:
-            self._id += 1
-            parent_id = self._id
 
-        self._scale[parent_id] = self.scale(vtx_id)
-
-        parent_id = super(MTG, self).insert_parent(vtx_id, parent_id, **properties)
-
+        ### TOBEDONE
         return parent_id
 
     def replace_parent(self, vtx_id, new_parent_id, **properties):
@@ -441,17 +447,7 @@ class LsMTG:
         :Returns:
             None
         '''
-        #if new_parent_id not in self:
-            #    raise ""
-        if self.scale(vtx_id) != self.scale(new_parent_id):
-            raise InvalidVertex("Can not replace vertex {} by vertex {} from a different scale".format(vtx_id, new_parent_id))
-
-        old_complex = self._complex.get(vtx_id)
-
-        super(MTG, self).replace_parent(vtx_id, new_parent_id, **properties)
-
-        if old_complex is not None:
-            self.replace_parent(old_complex, self.complex(new_parent_id))
+        ### TOBEDONE
 
 
     #########################################################################
@@ -470,13 +466,7 @@ class LsMTG:
         :Return Type:
             int
         '''
-        complex_id = self._complex.get(vtx_id)
-        while complex_id is None:
-            vtx_id = self.parent(vtx_id)
-            if vtx_id is None:
-                break
-            complex_id = self._complex.get(vtx_id)
-        return complex_id
+        return self.lstring.complex(vtx_id, self.consider)
 
     def complex_at_scale(self, vtx_id, scale):
         '''
@@ -491,11 +481,8 @@ class LsMTG:
         :Returns Type:
             int
         '''
-        complex_id = vtx_id
-        current_scale = self.scale(complex_id)
-        for i in range(scale, current_scale):
-            complex_id = self.complex(complex_id)
-        return complex_id
+        return self.lstring.complex(vtx_id, scale, self.consider)
+
 
     def components_iter(self, vid):
         '''
@@ -505,11 +492,7 @@ class LsMTG:
 
         :returns: iter of vertex identifier
         '''
-
-        if vid in self._components:
-            for v in self.component_roots_iter(vid):
-                for vtx in traversal.pre_order(self, v, complex=vid):
-                    yield vtx
+        return iter(self.components(vid,scale))
 
     def components(self, vid):
         '''
@@ -519,7 +502,7 @@ class LsMTG:
 
         :returns: list of vertex identifier
         '''
-        return list(self.components_iter(vid))
+        return self.lstring.components(vtx_id, self.consider)
 
     def components_at_scale_iter(self, vid, scale):
         '''
@@ -533,13 +516,8 @@ class LsMTG:
         # oops: search in the tree all the nodes which do not have another
         # explicit complex.
 
-        cur_scale = self.scale(vid)
+        return iter(self.components_at_scale(vid,scale))
 
-        gen = (vid, )
-        for i in range(cur_scale, scale):
-            gen = (vid for vtx in gen for vid in self.components_iter(vtx) )
-
-        return gen
 
     def components_at_scale(self, vid, scale):
         '''
@@ -550,12 +528,12 @@ class LsMTG:
 
         :returns: iter of vertex identifier
         '''
-        return list(self.components_at_scale_iter(vid, scale))
+        return self.lstring.components_at_scale(vid, scale, self.consider)
     
     def component_roots_iter(self, vtx_id):
         '''Return an iterator of the roots of the tree graphs that compose a vertex.
         '''
-        components = self._components.get(vtx_id,[])
+        components = self.components(vtx_id)
 
         for ci in components:
             p = self.parent(ci)
@@ -606,17 +584,9 @@ class LsMTG:
          - `complex_id`: The complex identifier.
          - `component_id`: Set the component identifier to this value if defined.
 
-    :Returns: The id of the new component or the component_id if given.
+        :Returns: The id of the new component or the component_id if given.
         '''
-        if component_id is None:
-            self._id += 1
-            component_id = self._id
-
-        self._add_vertex_properties(component_id, properties)
-
-        self._components.setdefault(complex_id,[]).append(component_id)
-        self._complex[component_id] = complex_id
-        self._scale[component_id] = self._scale[complex_id]+1
+        ### TOBEDONE
 
         return component_id
 
@@ -631,26 +601,7 @@ class LsMTG:
         :returns: (vid, vid): child and complex ids.
         '''
 
-        if complex is None:
-            self._id += 1
-            complex = self._id
-
-        if child in self._children.get(parent, []):
-            # add only the properties
-            self._add_vertex_properties(child, properties)
-        else:
-            child = self.add_child(parent, child, **properties)
-        self._scale[child] = self._scale[parent]
-
-
-        parent_complex = self.complex(parent)
-
-        if complex not in self._children.get(parent_complex, []):
-            self.add_child(parent_complex, complex)
-        self._scale[complex] = self._scale[parent_complex]
-
-        self._components.setdefault(complex,[]).append(child)
-        self._complex[child] = complex
+        ### TOBEDONE
 
         return child, complex
 
@@ -724,93 +675,11 @@ class LsMTG:
         :returns: A sub mtg of the mtg. If copy=True, a new MTG is returned.
             Else the sub mtg is created inplace by modifying the original tree.
         """
+        ### TOBEDONE
 
         if not copy:
             # remove all vertices not in the sub_tree
 
-            bunch = set(traversal.pre_order_in_scale(self, vtx_id))
-            remove_bunch = set(self) - bunch
-
-            self.root = vtx_id
-
-            # remove vertices by removing the element and deleting all the deges.
-            # We do not use standard methods because the graph will not be functional
-            # until the removal of all vertices.
-
-            # force remove
-            for vid in remove_bunch:
-
-                # TODO: Build specific methods (_force_remove) to edit a MTG without
-                # any verification. The MTG/Tree/whatever will be temporary invalid.
-
-                # remove properties
-                self._remove_vertex_properties(vid)
-                del self._scale[vid]
-
-                # remove parent edge
-                pid = self.parent(vid)
-                if pid is not None:
-                    self._children[pid].remove(vid)
-                    del self._parent[vid]
-                # remove children edges
-                for cid in self.children_iter(vid):
-                    self._parent[cid] = None
-                if vid in self._children:
-                    del self._children[vid]
-
-                # remove complex edges
-                complex_id = self._complex.get(vid)
-                if complex_id is not None:
-                    self._components[complex_id].remove(vid)
-                    del self._complex[vid]
-                # remove components edges
-                for cid in self.components_iter(vid):
-                    del self._complex[cid]
-                if vid in self._components:
-                    del self._components[vid]
-
-            # Update the scale of the nodes
-            scale = self._scale
-            root_scale = self.scale(vtx_id)
-            for vid in scale:
-                scale[vid] = scale[vid]-root_scale
-
-            self._scale[self.root] = 0
-
-            return self
-        else:
-            treeid_id = {}
-            g = MTG()
-            g.root = 0
-
-            for name in self.properties():
-                g.add_property(name)
-
-            treeid_id[vtx_id] = g.root
-            subtree = traversal.iter_mtg2(self, vtx_id)
-
-
-            # Skip the first vertex vtx_id
-            subtree.next()
-            # Traverse all the sub_mtg.
-            # Every vertex has a complex in this sub_mtg.
-            # Complex vertices are traversed before there components and
-            # parent before the children.
-
-            for vid in subtree:
-                complex_id = treeid_id[self.complex(vid)]
-                v = g.add_component(complex_id)
-                treeid_id[vid] = v
-
-                pid = self.parent(vid)
-                if pid in treeid_id:
-                    parent = treeid_id[pid]
-                    v = g.add_child(parent, child=v)
-
-                # Copy the properties
-                g._add_vertex_properties(v, self.get_vertex_property(vid))
-
-            return g
 
     #########################################################################
     # Specialised algorithms for aml compatibility.
@@ -844,7 +713,16 @@ class LsMTG:
 
         The different values are '<' for successor, and '+' for ramification.
         """
-        return self.property('edge_type').get(vid,'')
+        # Implement in cpp edge_type function
+        return self.lstring.edge_type(vid,self.consider)
+
+    def edges_types(self, scale=-1):
+        """
+        Type of the edges contained in the structure.
+
+        The different values are '<' for successor, and '+' for ramification.
+        """
+        return dict([(vid,self.edge_type(vid)) for vid in self.vertices(scale)])
 
     def label(self, vid):
         """Label of a vertex.
@@ -861,7 +739,7 @@ class LsMTG:
 
         .. seealso:: :func:`MTG`, :func:`index`, :func:`class_name`
         """
-        return self.property('label').get(vid, '')
+        return self.lstring[vid].name
 
     def class_name(self, vid):
         """Class of a vertex.
@@ -888,16 +766,7 @@ class LsMTG:
 
         .. seealso:: :func:`MTG`, :func:`openalea.mtg.aml.Index`, :func:`openalea.mtg.aml.Class`
         """
-        pattern = r'[a-zA-Z]+'
-        label = self.property('label').get(vid)
-        if not label:
-            return ''
-        else:
-            m=re.match(pattern, label)
-            if m:
-                return m.group(0)
-            else:
-                return ''
+        return self.lstring[vid].name
 
     def index(self, vid):
         """
@@ -911,46 +780,8 @@ class LsMTG:
         The label thus provides general information about a vertex and
         enables us to encode the plant components.
         """
-        pattern = r'[0-9]+$'
-        label = self.property('label').get(vid)
-        if not label:
-            return vid
-        else:
-            m=re.search(pattern, label)
-            if m:
-                return m.group(0)
-            else:
-                return vid
+        return vid
 
-    #########################################################################
-    # Proxy node interface
-    #########################################################################
-    def node(self, vid, klass=None):
-        """
-        Return a node associated to the vertex `vid`.
-
-        It allows to access to the properties with an object oriented interface.
-
-        :Example:
-
-        .. code-block:: python
-
-            node = g.node(1)
-            print node.edge_type
-            print node.label
-            node.label = 'B'
-            print g.label(1)
-
-            print node.parent
-            print list(node.children)
-        """
-        if klass is None:
-            klass = _ProxyNode
-        if vid in self:
-            return klass(self,vid)
-        else:
-            # TODO: retunr an error
-            return None
 
     #########################################################################
     # Compatibility with AML
@@ -1052,7 +883,7 @@ class LsMTG:
         if self.parent(v1) == v2:
             v1, v2 = v2, v1
 
-        return self.property('edge_type').get(v2)
+        return self.edge_type(v2)
 
     def Defined(self, vid):
         """
