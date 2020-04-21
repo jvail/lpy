@@ -39,7 +39,7 @@ endif()
 
 
 ## ###################################################################
-## Dependencies 
+## Dependencies
 ## ###################################################################
 
 # --- Python
@@ -54,7 +54,7 @@ find_package(Qt5Core CONFIG REQUIRED)
 find_package(Qt5Concurrent CONFIG REQUIRED)
 find_package(PlantGL REQUIRED)
 
-set(Boost_NO_SYSTEM_PATHS ON)
+set(Boost_NO_SYSTEM_PATHS OFF)
 set(Boost_USE_MULTITHREAD ON)
 set(Boost_USE_STATIC_LIBS OFF)
 set(BUILD_SHARED_LIBS ON)
