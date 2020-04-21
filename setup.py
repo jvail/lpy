@@ -47,7 +47,7 @@ def compile_interface():
     if not os.path.exists(py2exe_file):
         open(py2exe_file,'w').close()
 
-if 'install' in sys.argv:
+if 'install' in sys.argv and 'no-gui' not in sys.argv:
     compile_interface()
 
 
