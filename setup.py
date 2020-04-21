@@ -56,21 +56,21 @@ from setuptools import setup
 
 # Scons build directory
 build_prefix= "build-cmake"
-
-if 'CONDA_PREFIX' in os.environ or 'PREFIX' in os.environ :
-    deploy_args = {}
-else:
-    currentdir = os.path.dirname(__file__)
-    deploy_args = dict(
-        # Specific options of openalea.deploy
-        lib_dirs = {'lib' : pj(currentdir, build_prefix, 'lib'),},
-        bin_dirs = {'bin':  pj(currentdir, build_prefix, 'bin'),},
-        inc_dirs = { 'include' : pj(currentdir, build_prefix, 'include') },
-        share_dirs = { 'share' : 'share'},
-        postinstall_scripts = ['pgl_postinstall',],
-        namespace_packages = [namespace],
-        create_namespaces = False,
-    )
+deploy_args = {}
+# if 'CONDA_PREFIX' in os.environ or 'PREFIX' in os.environ :
+#     deploy_args = {}
+# else:
+#     currentdir = os.path.dirname(__file__)
+#     deploy_args = dict(
+#         # Specific options of openalea.deploy
+#         lib_dirs = {'lib' : pj(currentdir, build_prefix, 'lib'),},
+#         bin_dirs = {'bin':  pj(currentdir, build_prefix, 'bin'),},
+#         inc_dirs = { 'include' : pj(currentdir, build_prefix, 'include') },
+#         share_dirs = { 'share' : 'share'},
+#         postinstall_scripts = ['pgl_postinstall',],
+#         namespace_packages = [namespace],
+#         create_namespaces = False,
+#     )
 
 setup(
     name=name,
