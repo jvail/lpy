@@ -96,6 +96,8 @@ class AbstractSimulation:
     def getBaseName(self):
         if self._fname is None : return 'New'
         else : return os.path.basename(self.fname)
+    def getFileName(self):
+        return self._fname
     def getTabName(self):
         t = ''
         #if self.textedition:
@@ -379,6 +381,8 @@ class AbstractSimulation:
     def opencode(self,txt):
         pass
 
+    def pre_run(self,task):
+        pass
     def run(self, task):
         pass
     def post_run(self,task):
@@ -729,6 +733,10 @@ class LpySimulation (AbstractSimulation):
             self.textdocument.setPlainText(self.code)
             self.lpywidget.textEditionWatch = True
 
+    def pre_run(self,task):
+        self.lpywidget.viewer.start()
+        self.lpywidget.viewer.setAnimation(eStatic if self.firstView or task.fitRunView else eAnimatedPrimitives)
+
     def run(self,task):
         dl = self.lsystem.derivationLength
         timing = time()
@@ -778,7 +786,7 @@ class LpySimulation (AbstractSimulation):
         if self.isTextEdited() or self.lsystem.empty() or self.nbiterations == 0 or self.nbiterations >= self.lsystem.derivationLength:
             self.updateLsystemCode()
         self.lpywidget.viewer.start()
-        self.lpywidget.viewer.setAnimation(eStatic if self.firstView and task.fitAnimationView else eAnimatedPrimitives)
+        self.lpywidget.viewer.setAnimation(eStatic if self.firstView or task.fitAnimationView else eAnimatedPrimitives)
 
     def post_animate(self,task):
         if hasattr(task,'result'):
