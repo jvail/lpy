@@ -180,23 +180,26 @@ endlsystem
 __lpy_code_version__ = 1.1
 
 def __initialiseContext__(context):
-	import openalea.plantgl.all as pgl
-	Color_0 = pgl.Material("Color_0" , ambient = (30,60,10) , diffuse = 3 , )
-	Color_0.name = "Color_0"
-	context.turtle.setMaterial(0,Color_0)
-	Color_1 = pgl.Material("Color_1" , ambient = (0,0,83) , diffuse = 1.92771 , )
-	Color_1.name = "Color_1"
-	context.turtle.setMaterial(1,Color_1)
-	Color_2 = pgl.Material("Color_2" , ambient = (72,47,0) , diffuse = 3.05556 , )
-	Color_2.name = "Color_2"
-	context.turtle.setMaterial(2,Color_2)
-	Color_5 = pgl.Material("Color_5" , ambient = (0,0,0) , )
-	Color_5.name = "Color_5"
-	context.turtle.setMaterial(5,Color_5)
-	Color_6 = pgl.Material("Color_6" , ambient = (100,100,100) , diffuse = 1.01 , )
-	Color_6.name = "Color_6"
-	context.turtle.setMaterial(6,Color_6)
-__authors__ = ' F. Boudon, C. Godin'
+    import openalea.plantgl.all as pgl
+    Color_0 = pgl.Material("Color_0" , ambient = (30,60,10) , diffuse = 3 , )
+    Color_0.name = "Color_0"
+    context.turtle.setMaterial(0,Color_0)
+    Color_1 = pgl.Material("Color_1" , ambient = (0,0,83) , diffuse = 1.92771 , )
+    Color_1.name = "Color_1"
+    context.turtle.setMaterial(1,Color_1)
+    Color_2 = pgl.Material("Color_2" , ambient = (72,47,0) , diffuse = 3 , )
+    Color_2.name = "Color_2"
+    context.turtle.setMaterial(2,Color_2)
+    Color_5 = pgl.Material("Color_5" , ambient = (0,0,0) , diffuse = 3 )
+    Color_5.name = "Color_5"
+    context.turtle.setMaterial(5,Color_5)
+    Color_6 = pgl.Material("Color_6" , ambient = (100,100,100) , diffuse = 1.01 , )
+    Color_6.name = "Color_6"
+    context.turtle.setMaterial(6,Color_6)
+    context['__scalars__'] = []
+    context['__parameterset__'] = []
+
+    __authors__ = ' F. Boudon, C. Godin'
 __institutes__ = 'INRIA - CIRAD Virtual Plants'
 __copyright__ = 'open-source GPL'
 __description__ = '- Try different values for Veg_Decrease_Param, B_Difference and B_Duration = 3 to obtain different architecture\n\n-You can uncomment given sets of values to obtain panicle, raceme or sympodial cyme architecture.\n'

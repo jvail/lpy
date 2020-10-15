@@ -98,7 +98,7 @@ LeafSet(l,topdiam) :
   nbsegment,lastseg = divmod(l,dl)
   if WITHLEAF:
     nproduce [ @Ge _(0.1)
-    for i in xrange(nbsegment):
+    for i in range(nbsegment):
       nproduce f(dl)/(137)[&(60) 
       nproduce F(2)[+(60) ^(10) ~l(5)][-(60) ^(10) ~l(5)]
       nproduce F(5)[+(60)~l(5)][-(60)~l(5)]
@@ -126,7 +126,7 @@ LeafSet(l,topdiam) :
   nbsegment,lastseg = divmod(l,dl)
   if WITHLEAF:
     nproduce [ @Ge _(0.1)
-    for i in xrange(int(nbsegment)):
+    for i in range(int(nbsegment)):
       nproduce f(dl)/(137)[&(60) 
       nproduce F(2)[+(60) ^(10) ~l(5)][-(60) ^(10) ~l(5)]
       nproduce F(5)[+(60)~l(5)][-(60)~l(5)]
